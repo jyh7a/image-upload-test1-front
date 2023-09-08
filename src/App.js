@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import axios from 'axios'
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import ImageLayout from './ImageLayout';  // 새로운 컴포넌트
 
 import './App.css'
 
-async function postImage({image, description}) {
+async function postImage({image, title}) {
   const formData = new FormData();
   formData.append("image", image)
-  formData.append("description", description)
+  formData.append("title", title)
 
   const result = await axios.post('/images', formData, { headers: {'Content-Type': 'multipart/form-data'}})
   return result.data
@@ -16,12 +18,12 @@ async function postImage({image, description}) {
 function App() {
 
   const [file, setFile] = useState()
-  const [description, setDescription] = useState("")
+  const [title, setTitle] = useState("")
   const [images, setImages] = useState([])
 
   const submit = async event => {
     event.preventDefault()
-    const result = await postImage({image: file, description})
+    const result = await postImage({image: file, title})
     setImages([result.image, ...images])
   }
 
@@ -31,10 +33,16 @@ function App() {
 	}
 
   return (
-    <div className="App">
+    <Router>
+    <Switch>
+      <Route path="/image-layout">
+        <ImageLayout />
+      </Route>
+      <Route path="/">
+      <div className="App">
       <form onSubmit={submit}>
         <input onChange={fileSelected} type="file" accept="image/*"></input>
-        <input value={description} onChange={e => setDescription(e.target.value)} type="text"></input>
+        <input value={title} onChange={e => setTitle(e.target.value)} type="text"></input>
         <button type="submit">Submit</button>
       </form>
 
@@ -44,9 +52,14 @@ function App() {
         </div>
       ))}
 
-      <img src="/images/995bad302b5a4e7fae8d4bfbda8ad026"></img>
+      <img src="/images/89663a190338356b979c13d332211578"></img>
 
     </div>
+      </Route>
+    </Switch>
+  </Router>
+
+
   );
 }
 
